@@ -1,7 +1,12 @@
 package org.usfirst.frc.team9999.robot.subsystems;
 
+import org.usfirst.frc.team9999.robot.Robot;
+import org.usfirst.frc.team9999.robot.RobotMap;
 import org.usfirst.frc.team9999.robot.Subsystems;
 
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.command.Subsystem;
 
 /**
@@ -25,17 +30,8 @@ public class DriveBase extends Subsystem {
     // here. Call these from Commands.
 	
 	public void stop(){
-		ss.pidDrive1.setSetpoint(0);
-		ss.pidDrive2.setSetpoint(0);
-		ss.pidDrive3.setSetpoint(0);
-		ss.pidDrive4.setSetpoint(0);
-		driveSystem = new PIDDrive[] {ss.pidDrive1, ss.pidDrive2, ss.pidDrive3, ss.pidDrive4};
-		
-		ss.pidSteer1.setSetpoint(0);
-		ss.pidSteer2.setSetpoint(0);
-		ss.pidSteer3.setSetpoint(0);
-		ss.pidSteer4.setSetpoint(0);
-		steerSystem = new PIDSteer[] {ss.pidSteer1, ss.pidSteer2, ss.pidSteer3, ss.pidSteer4};
+		driveSystem = new PIDDrive[] {new PIDDrive(1), new PIDDrive(2), new PIDDrive(3), new PIDDrive(4)};
+		steerSystem = new PIDSteer[] {new PIDSteer(1), new PIDSteer(2), new PIDSteer(3), new PIDSteer(4)};
 	}
 	
 	public void drive(double fwd, double str, double rcw){
@@ -47,10 +43,16 @@ public class DriveBase extends Subsystem {
 		double[] wheelSpeeds = getWheelSpeeds(a, b, c, d);
 		double[] wheelAngles = getWheelAngles(a, b, c, d);
 		
-		// THIS WONT WORK.... Breaks on the 180 -> -180 point
+		// This should work...?
 		for(int i = 0; i < wheelAngles.length; i++){
 			double pAngle = steerSystem[i].getAngle();
-			if(Math.abs(wheelAngles[i] - pAngle) > 90) wheelSpeeds[i] *= -1;
+			double travel = Math.abs(wheelAngles[i] - pAngle);
+			if(travel > 90 && travel < 270) wheelSpeeds[i] *= -1;
+		}
+		
+		for(int i = 0; i < 4; i++){
+			driveSystem[i].setSetpoint(wheelSpeeds[i]);
+			steerSystem[i].setSetpoint(wheelAngles[i]);
 		}
 	}
 
@@ -90,3 +92,91 @@ public class DriveBase extends Subsystem {
     }
 }
 
+
+class PIDDrive extends PIDSubsystem {
+
+	Talon driveMotor;
+	Encoder driveEncoder;
+	
+	boolean rateBasedDrive;
+	
+    // Initialize your subsystem here
+    public PIDDrive(int wheelNum) {
+    	super("PIDDrive" + wheelNum, 1.0, 0.0, 0.0);
+        // Use these to get going:
+        // setSetpoint() -  Sets where the PID controller should move the system
+        //                  to
+        // enable() - Enables the PID controller.
+    	
+    	driveMotor  = new Talon(RobotMap.driveMotors[wheelNum-1]);
+    	driveEncoder = new Encoder(RobotMap.driveEncoders[wheelNum*2], RobotMap.driveEncoders[wheelNum*2 + 1]);
+    	
+    	setSetpoint(0.0);
+    	enable();
+    	rateBasedDrive = Robot.rateBasedDrive;
+    }
+    
+    public void initDefaultCommand() {
+        // Set the default command for a subsystem here.
+        //setDefaultCommand(new MySpecialCommand());
+    }
+    
+    protected double returnPIDInput() {
+        // Return your input value for the PID loop
+        // e.g. a sensor, like a potentiometer:
+        // yourPot.getAverageVoltage() / kYourMaxVoltage;
+    	return rateBasedDrive ? driveEncoder.getRate() : driveEncoder.getDistance();
+    }
+    
+    protected void usePIDOutput(double output) {
+        // Use output to drive your system, like a motor
+        // e.g. yourMotor.set(output);
+    	driveMotor.set(output);
+    }
+    
+    public double getSpeed(){
+    	return driveMotor.get();
+    }
+}
+
+class PIDSteer extends PIDSubsystem {
+	
+	Talon steerMotor;
+	Encoder steerEncoder;
+
+    // Initialize your subsystem here
+    public PIDSteer(int wheelNum) {
+    	super("PIDSteer" + wheelNum, 1, 0, 0);
+        // Use these to get going:
+        // setSetpoint() -  Sets where the PID controller should move the system
+        //                  to
+        // enable() - Enables the PID controller.
+    	steerMotor  = new Talon(RobotMap.steerMotors[wheelNum-1]);
+    	steerEncoder = new Encoder(RobotMap.steerEncoders[wheelNum*2], RobotMap.steerEncoders[wheelNum*2 + 1]);
+    	
+    	setSetpoint(0.0);
+    	enable();
+    }
+    
+    public void initDefaultCommand() {
+        // Set the default command for a subsystem here.
+        //setDefaultCommand(new MySpecialCommand());
+    }
+    
+    protected double returnPIDInput() {
+        // Return your input value for the PID loop
+        // e.g. a sensor, like a potentiometer:
+        // yourPot.getAverageVoltage() / kYourMaxVoltage;
+    	return steerEncoder.getDistance();
+    }
+    
+    protected void usePIDOutput(double output) {
+        // Use output to drive your system, like a motor
+        // e.g. yourMotor.set(output);
+    	steerMotor.set(output);
+    }
+    
+    public double getAngle(){
+    	return steerEncoder.getDistance();
+    }
+}
