@@ -45,4 +45,8 @@ public class PIDSteer extends PIDSubsystem {
         // e.g. yourMotor.set(output);
     	steerMotor.set(output);
     }
+    
+    public double getAngle(){
+    	return steerEncoder.getDistance();
+    }
 }

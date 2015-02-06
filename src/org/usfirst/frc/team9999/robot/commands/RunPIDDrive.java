@@ -15,11 +15,7 @@ public class RunPIDDrive extends Command {
 	
 	private double FWD;
 	private double STR;
-	
-	private final int trackWidth = 24;
-	private final int wheelBase = 43;
-	private final double radius = Math.sqrt(trackWidth^2 + wheelBase^2);
-	
+
     public RunPIDDrive() {
         // Use requires() here to declare subsystem dependencies
         // eg. requires(chassis);
@@ -50,7 +46,7 @@ public class RunPIDDrive extends Command {
     	STR = -1*FWD * Math.sin(fieldAngle) + STR * Math.cos(fieldAngle);
     	FWD = temp;
     	
-    	
+    	ss.driveBase.drive(FWD, STR, RCW);
     }
     
 
