@@ -22,13 +22,16 @@ public class OI {
 	}
 	
 	public Joystick driveJoy = new Joystick(0);
+	public Joystick steerJoy = new Joystick(1);
 	
 	public Axis driveX;
 	public Axis driveY;
+	public Axis steer;
 	
 	public OI(){
 		driveX = new Axis(driveJoy, 0);
 		driveY = new Axis(driveJoy, 1);
+		steer = new Axis(steerJoy, 0);
 	}
     //// CREATING BUTTONS
     // One type of button is a joystick button which is any button on a joystick.

@@ -1,0 +1,10 @@
+TODO
+
+PIDSteer
+	get the correct distance per pulse for the encoder
+		1(distance) should equal 1 degree
+		
+Implement a PIDDrive Overseer
+	The subsystem for commands to interact with in teleop
+	
+	Tracks and updates all of the PIDDrive SSs and PIDSteer SSs

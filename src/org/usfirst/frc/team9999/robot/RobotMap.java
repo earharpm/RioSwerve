@@ -18,6 +18,10 @@ public class RobotMap {
 	
 	//PWM Out
 	public static int driveMotor1 = 1;
+	public static int steerMotor1 = 2;
+	
+	public static int[] driveMotors = {driveMotor1};
+	public static int[] steerMotors = {steerMotor1};
 	
 	//Analog In
 	public static int encoder2Analog = 1;
@@ -25,4 +29,10 @@ public class RobotMap {
 	//Digital I/O
 	public static int encoder1A = 1;
 	public static int encoder1B = 2;
+	
+	public static int encoder2A = 3;
+	public static int encoder2B = 4;
+	
+	public static int[] driveEncoders = {encoder1A, encoder1B};
+	public static int[] steerEncoders = {encoder2A, encoder2B};
 }
