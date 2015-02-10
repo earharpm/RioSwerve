@@ -167,7 +167,7 @@ class PIDSteer extends PIDSubsystem {
         // Return your input value for the PID loop
         // e.g. a sensor, like a potentiometer:
         // yourPot.getAverageVoltage() / kYourMaxVoltage;
-    	return steerEncoder.getDistance();
+    	return getAngle();
     }
     
     protected void usePIDOutput(double output) {
@@ -177,6 +177,7 @@ class PIDSteer extends PIDSubsystem {
     }
     
     public double getAngle(){
+    	// Need to figure out what the conversion from encoder to pod angle is.
     	return steerEncoder.getDistance();
     }
 }
